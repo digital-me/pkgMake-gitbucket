@@ -1,2 +1,2 @@
 # pkgMake-gitbucket
-Package gitbucket using rpmMake module
+Package gitbucket using [rpmMake](rpmMake/README.md) module
