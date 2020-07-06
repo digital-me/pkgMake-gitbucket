@@ -1,4 +1,39 @@
 %changelog
+* Sun Apr 7 2019 Digital-Me Infra Team <infra@digital-me.nl> - 4.31.2-0.1
+- Bug and security fix
+
+* Sat Mar 16 2019 Digital-Me Infra Team <infra@digital-me.nl> - 4.31.1-0.1
+- Bug fix
+
+* Sat Mar 16 2019 Digital-Me Infra Team <infra@digital-me.nl> - 4.31.0-0.1
+- Docker support in CI plugin
+- Verify GPG key signed commit
+- OAuth2 Token (sent as a parameter) authentication support and new APIs in Web API
+- OGP (Open Graph protocol) support
+- Username completion with avatars
+
+* Fri Dec 21 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.30.1-0.1
+- Bug fix for several WebHooks and Web API
+
+* Sat Dec 15 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.30.0-0.1
+- Automatic ChangeLog Summary generation for new Releases
+- A lot of GitBucket Web API updates to increase compatibility with the GitHub API.
+- Display of checkboxes in Markdown files in Git repositories
+- A new extension point for plugins: anonymousAccessiblePaths
+- Group support in the Gist Plugin
+- Allow redirection to the Release Page from the Activity Timeline Page
+
+* Thu Sep 29 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.29.0-0.0
+- Official Docker image has been available
+- Enhance file edit and delete buttons of the repository viewer
+- Fix Patch button to generate patches for all files in the commit
+- Display confirmation dialog for Transfer Ownership and Garbage collection
+- Fix wrong url encoding in "Compare & pull request"
+
+* Sat Sep 1 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.28.0-0.0
+- Proxy support for plugin installation
+- Fix some bugs around pull requests
+
 * Tue Jul 31 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.27.0-0.1
 - Create new tag on the browser
 - EditorConfig support
