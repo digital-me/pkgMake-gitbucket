@@ -1,0 +1,228 @@
+#!/bin/bash
+#
+# RedHat: /etc/rc.d/init.d/gitbucket
+#
+# Starts the GitBucket server
+#
+# chkconfig: 345 60 40
+# description: Run GitBucket server
+# processname: java
+### BEGIN INIT INFO
+# Provides: gitbucket
+# Required-Start: $network $local_fs $syslog
+# Required-Stop: $network $local_fs $syslog
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# Description: GitBucket server
+# Short-Description: start and stop gitbucket
+### END INIT INFO
+
+## Source function library.
+#. /etc/rc.d/init.d/functions
+# Source LSB function library.
+if [ -r /lib/lsb/init-functions ]; then
+    . /lib/lsb/init-functions
+else
+    exit 1
+fi
+
+DISTRIB_ID=`lsb_release -i -s 2>/dev/null`
+
+NAME="$(basename $0)"
+unset ISBOOT
+if [ "${NAME:0:1}" = "S" -o "${NAME:0:1}" = "K" ]; then
+    NAME="${NAME:3}"
+    ISBOOT="1"
+fi
+
+# For SELinux we need to use 'runuser' not 'su'
+if [ -x "/sbin/runuser" ]; then
+    SU="/sbin/runuser -s /bin/sh"
+else
+    SU="/bin/su -s /bin/sh"
+fi
+
+# Pull in cq settings
+[ -f /etc/sysconfig/${NAME} ] && source /etc/sysconfig/${NAME}        # RedHat
+[ -f ${NAME}.conf ] && source ${NAME}.conf                # For all systems
+
+# Location of the log and PID file
+: ${GITBUCKET_INIT_LOG_FILE:="$GITBUCKET_LOG_DIR/init.log"}
+: ${GITBUCKET_LOG_FILE:="$GITBUCKET_LOG_DIR/run.log"}
+: ${GITBUCKET_PID_DIR:="/var/run/${NAME}"}
+: ${GITBUCKET_PID_FILE:="${GITBUCKET_PID_DIR}/${NAME}.pid"}
+: ${GITBUCKET_LOCK_FILE:="/var/lock/subsys/${NAME}"}
+
+# Other default settings
+: ${GITBUCKET_USER:="${NAME}"}
+: ${GITBUCKET_GROUP:="${NAME}"}
+: ${GITBUCKET_HOME:="/var/lib/${NAME}"}
+: ${GITBUCKET_WAR_FILE:="/usr/share/${NAME}/lib/${NAME}.war"}
+: ${GITBUCKET_MAX_LOG:=5}                        # To rotate stdout/err log files
+: ${GITBUCKET_DELAY:=5}                            # To wait upon start/stop
+
+# Some defaults
+RETVAL=0
+PID=0
+
+function rotatelog()
+{
+    LOG_ARCHIVE=$GITBUCKET_LOG_FILE.$(date "+%s")
+    cp -a $GITBUCKET_LOG_FILE $LOG_ARCHIVE
+    $SU ${GITBUCKET_USER} -c "echo -n > $GITBUCKET_LOG_FILE"
+    gzip $LOG_ARCHIVE
+    local ARCHIVE_COUNT=0
+    ls -t1 /var/log/gitbucket/run.log.*.gz | while read ARCHIVE; do
+        ARCHIVE_COUNT=$((ARCHIVE_COUNT+1))
+        [ $ARCHIVE_COUNT -le $GITBUCKET_MAX_LOG ] || rm -vf $ARCHIVE >> $GITBUCKET_INIT_LOG_FILE 2>&1
+    done
+}
+
+function log_init_msg()
+{
+    MSG=${1:-"!missing msg!"}
+    $SU ${GITBUCKET_USER} -c "echo $(date "+%F %T") \"${MSG}\" >> $GITBUCKET_INIT_LOG_FILE"
+}
+
+function start()
+{
+    log_init_msg "Starting..."
+    echo -n "Starting ${NAME}: "
+
+    # Verify if the daemon is not already running
+    PID=$(pidofproc -p "${GITBUCKET_PID_FILE}" "${NAME}")
+    RETVAL="$?"
+    if [ $RETVAL -eq 0 ]; then
+        log_init_msg "Already started"
+        log_success_msg "already running (pid ${PID})"
+        RETVAL="0"
+        return
+    fi
+
+    # Rotate logs before starting
+    [ -f "${GITBUCKET_LOG_FILE}" ] && rotatelog
+
+    # Prepare dir for pid file with permissions if required
+    $SU ${GITBUCKET_USER} -c "touch '${GITBUCKET_PID_FILE}' 2> /dev/null && rm -f '${GITBUCKET_PID_FILE}'" \
+    || { rm -rf "${GITBUCKET_PID_DIR}" && mkdir -p "${GITBUCKET_PID_DIR}" && chown ${GITBUCKET_USER}:${GITBUCKET_GROUP} "${GITBUCKET_PID_DIR}"; }
+
+    # Collection options to start the daemon
+    START_OPTS=
+    if [ $GITBUCKET_PORT ]; then
+        START_OPTS="${START_OPTS} --port=${GITBUCKET_PORT}"
+    fi
+    if [ $GITBUCKET_PREFIX ]; then
+        START_OPTS="${START_OPTS} --prefix=${GITBUCKET_PREFIX}"
+    fi
+    if [ $GITBUCKET_HOST ]; then
+        START_OPTS="${START_OPTS} --host=${GITBUCKET_HOST}"
+    fi
+
+    # Start the daemon using nohup and write pid
+    GITBUCKET_HOME="${GITBUCKET_HOME}" $SU ${GITBUCKET_USER} -c "\
+nohup java -cp $GITBUCKET_WAR_FILE:$GITBUCKET_CP $GITBUCKET_JVM_OPTS JettyLauncher $START_OPTS >> $GITBUCKET_LOG_FILE 2>&1 & \
+sleep ${GITBUCKET_DELAY} && \
+echo \$! > ${GITBUCKET_PID_FILE}\
+"
+
+    # Verify if the daemon is running
+    PID=$(pidofproc -p "${GITBUCKET_PID_FILE}" "${NAME}")
+    RETVAL="$?"
+    if [ $RETVAL -eq 0 ] ; then
+        touch ${GITBUCKET_LOCK_FILE}
+        log_success_msg "running (pid ${PID})"
+        log_init_msg "Started (pid ${PID})"
+    else
+        log_failure_msg "failed (exit code ${RETVAL})"
+        log_init_msg "Failed to start (exit code ${RETVAL})"
+    fi
+}
+
+function stop()
+{
+    log_init_msg "Stopping..."
+    echo -n "Stopping ${NAME}: "
+
+    # Verify if the daemon is not already stopped
+    PID=$(pidofproc -p "${GITBUCKET_PID_FILE}" "${NAME}")
+    RETVAL="$?"
+    if [[ $RETVAL -ne 0 ]]; then
+        log_failure_msg "not running"
+        log_init_msg "Already stopped"
+        RETVAL="0"
+        return
+    fi
+
+    # Stop the daemon and collect the exit code
+    killproc -p ${GITBUCKET_PID_FILE} -d ${GITBUCKET_DELAY} ${NAME} && RETVAL="0" || RETVAL="$?"
+
+    if [[ $RETVAL -eq 0 ]]; then
+        log_success_msg "no longer running (pid ${PID})"
+        log_init_msg "Stopped (pid ${PID})"
+        rm -f "${GITBUCKET_PID_FILE}" "${GITBUCKET_LOCK_FILE}" || true
+        RETVAL="0"
+    else
+        log_failure_msg "could not be killed (pid ${PID} / exit code ${RETVAL})"
+        log_init_msg "Could not be killed (pid ${PID} / exit code ${RETVAL})"
+        RETVAL="1"
+    fi
+}
+
+function status()
+{
+	  # See LSB doc for exit codes
+	  # https://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+    PID=$(pidofproc -p "${GITBUCKET_PID_FILE}" "${NAME}")
+    RETVAL="$?"
+    if [ "$RETVAL" -eq "0" ]; then
+        echo "${NAME} (pid ${PID}) is running..."
+    elif [ "$RETVAL" -eq "1" ]; then
+        echo "${NAME} PID file exists, but process is not running"
+    else
+        if [ -f "${GITBUCKET_LOCKFILE}" ]; then
+            echo "${NAME} lockfile exists but process is not running"
+            RETVAL="2"
+        else
+           echo "${NAME} is stopped"
+           RETVAL="3"
+        fi
+    fi
+}
+
+function usage()
+{
+    echo "Usage: $0 {start|stop|restart|force-reload|condrestart|try-restart|status}"
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart|force-reload)
+        stop
+        start
+        ;;
+    condrestart|try-restart)
+        pidofproc -p "${GITBUCKET_PID_FILE}" "${NAME}" > /dev/null && RETVAL="0" || RETVAL="$?"
+        if [ ${RETVAL} -eq 0 ]; then
+            stop
+            start
+        else
+        	  # If not running action should return 0 - see LSB doc
+            RETVAL="0"
+        fi
+        ;;
+    status)
+        status
+        ;;
+    *)
+        usage
+        # Not implemented action should return 3 - see LSB doc
+        RETVAL="3"
+        ;;
+esac
+
+exit $RETVAL

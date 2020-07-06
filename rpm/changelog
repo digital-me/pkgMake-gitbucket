@@ -1,0 +1,196 @@
+%changelog
+* Tue Jul 31 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.27.0-0.1
+- Create new tag on the browser
+- EditorConfig support
+- Improve issues / pull requests search
+- Add proxy support
+
+* Tue Jul 31 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.26.0-0.1
+- Installing plugins from the central registry
+- Repositories tab in the dashboard
+- Fork dialog enhancement
+- Adjust pull request creation suggestor
+- Keep showing incompleted task list
+- New notification hooks
+
+* Wed Jun 20 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.25.0-0.1
+- Security improvements
+- Show mail address at the profile page
+- Task list on commit comments
+- More detailed editing history of issues and pull requests
+- Expose user public keys
+- Download repository improvements
+
+* Mon Apr 30 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.24.1-0.1
+- Diff for each review comment on pull requests
+- Extra mail addresses support
+- Show tags at the commit list
+- Keep wrap mode of the online editor
+- Renew layout of gitbucket-gist-plugin
+- Web API of gitbucket-ci-plugin
+- Fix bug in Web API authentication
+
+* Mon Apr 09 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.23.1-0.1
+- Allow tail slash in URL
+- Display commit message of tags at the releases page
+- Add labels property to issues and pull requests API response
+- Plugins list API
+- Git authentication with personal access token
+- Max parallel builds and max stored history in CI plugin became configurable
+- Fix bug that the contents API doesn't work for the repository root
+- Fix shutdown problem in Tomcat deployment
+- Render by plugins at the blob view even if it's a binary file
+
+* Fri Mar 02 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.22.0-0.1
+- Pull request merge strategy settings
+- Create repository with an empty commit
+- Improve database viewer
+- Update maven-repository-plugin
+
+* Sat Jan 27 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.21.2-0.1
+- Release page
+- OpenID Connect support
+- New database viewer
+- Submodule links to web page
+- Clarify close/reopen button
+- Bug fix for issue owned by disabled user
+
+* Tue Jan 09 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.20.0-0.1
+- Squash and rebase merge strategy for pull requests
+- Quick pull request creation
+- Download patch from the diff view
+- Fork and create repository are proceeded asynchronously
+- Create new repository by copying existing git repository
+- Hide overflowed repository names in the sidebar
+- Support CreateEvent web hook
+- Display conflicting files if pull request can't be merged
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.20.0
+
+* Tue Jan 09 2018 Digital-Me Infra Team <infra@digital-me.nl> - 4.19.3-0.1
+- Fix file uploading bug
+- Fix reply comment form behavior in the diff view
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.19.3
+
+* Wed Dec 06 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.19.2-0.1
+- Fix routing bug in CompositeScalatraFilter
+- Resolve id attribute collision in the web hook editing form
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.19.2
+
+* Sat Dec 2 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.19.1-0.1
+- Update notification plugin
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.19.1
+
+* Fri Dec 1 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.19.0-0.1
+- gitbucket-maven-repository-plugin is available
+- Upgrade to Scalatra 2.6
+- Improve layout of the system settings page
+- New extension point (sshCommandProvider)
+- Dropped gitbucket-pages-plugin from bundled plugins temporary because we couldn't complete update for Scalatra 2.6 before this release.
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.19.0
+
+* Fri Nov 24 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.18.0-0.1
+- Form to reply to review comment
+- Display fullname in username suggestion
+- Commit hook plugins are applied to online editing
+- Improve gitbucket-ci-plugin
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.18.0
+
+* Sat Sep 30 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.17.0-0.1
+- gitbucket-ci-plugin is available
+- Transferring to URL with commit ID
+- Drop uploadable file type limitation
+- Improve Mailer API
+- Web API and webhook enhancement
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.17.0
+
+* Sat Sep 2 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.16.0-0.1
+- Support AdminLTE color skin
+- Improve unexpected error handling
+- Show commit status on the commits list
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.16.0
+
+* Sat Aug 5 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.15.0-0.1
+- Version bump to v4.15.0
+- Bundle GitBucket organization plugins
+- Notifications plugin
+- Plugin hot deployment
+- Update Slick to 3.2.1 from 3.2.0
+- Support ed25519 keys for SSH
+- Markdown preview in comment editing forms
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.15.0
+
+* Thu Jul 13 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.14.1-0.1
+- Version bump to v4.14.1
+- Bug fix: Possibility of error in forking repository
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.14.1
+
+* Mon Jul 03 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.14-0.1
+- Version bump to v4.14
+- Support priority in issues and pull requests
+- Show icons when the sidebar is collapsed
+- Support gollumn events in web hook
+- Support account (user / group) level web hook
+- Add --max_file_size option
+- Configuration by system property or environment variable
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.14
+
+* Mon Jul 3 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.13-0.1
+- Version bump to v4.13
+- Uploading files into the repository
+- HTML is available in Markdown
+- Added filter box to dropdown menus
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.13
+
+* Mon Jul 3 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.12-0.1
+- Version bump to v4.12
+- Gist plug-in provides JavaScript to embed snippet
+- Dropdown menu filter in the branch comparing page
+- Caution for the embedded H2 database
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.12
+
+* Mon Jul 3 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.11-0.1
+- Version bump to v4.11
+- Deploy keys support
+- Auto generate avatar images
+- Collaborators of the private forked repository are copied from the original repository
+- Cache avatar images in the browser
+- New extension point to receive events about repository
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.11
+
+* Sun Feb 26 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.10-0.1
+- Version bump to v4.10
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.10
+
+* Sun Feb 26 2017 Digital-Me Infra Team <infra@digital-me.nl> - 4.9-0.1
+- Version bump to v4.9
+- Release note: https://github.com/gitbucket/gitbucket/releases/tag/4.9
+
+* Mon Jan 9 2017 BeN <ben at tergology.com> - 4.8-0.1
+- Version bump to v4.8
+
+* Tue Dec 6 2016 BeN <ben at tergology.com> - 4.7.1-0.1
+- Version bump to v4.7.1
+
+* Mon Oct 10 2016 BeN <ben at tergology.com> - 4.5-0.1
+- Version bump to v4.5
+
+* Mon Nov 24 2014 Toru Takahashi <torutk at gmail.com>
+- Version bump to v2.6
+
+* Sun Nov 09 2014 Toru Takahashi <torutk at gmail.com>
+- Version bump to v2.5
+
+* Sun Oct 26 2014 Toru Takahashi <torutk at gmail.com>
+- Version bump to v2.4.1
+
+* Mon Jul 21 2014 Toru Takahashi <torutk at gmail.com>
+- execute as gitbucket user
+
+* Sun Jul 20 2014 Toru Takahashi <torutk at gmail.com>
+- Version bump to v2.1.
+
+* Mon Oct 28 2013 Jiri Tyr <jiri_DOT_tyr at gmail.com>
+- Version bump to v1.7.
+
+* Thu Oct 17 2013 Jiri Tyr <jiri_DOT_tyr at gmail.com>
+- First build.

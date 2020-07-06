@@ -1,0 +1,63 @@
+%define name #RPM_NAME#
+%define version #RPM_VERSION#
+%define release #RPM_RELEASE#
+
+Summary:	GitHub clone written with Scala.
+Name: %{name}
+Version: %{version}
+Release: %{release}%{?dist}
+License:	Apache
+URL:		https://github.com/gitbucket/gitbucket
+Group:		System/Servers
+Source0:	https://github.com/gitbucket/gitbucket/releases/download/#RPM_VERSION#/gitbucket.war
+Source1:	https://github.com/gitbucket/gitbucket/raw/#RPM_VERSION#/contrib/gitbucket.conf
+Source2:	gitbucket.init
+BuildRoot:	%{_tmppath}/%{name}-%{version}-root
+BuildArch:	noarch
+Requires:	java >= 1.8.0
+
+
+%description
+
+GitBucket is the easily installable GitHub clone written with Scala.
+
+
+%install
+[ "%{buildroot}" != / ] && %{__rm} -rf "%{buildroot}"
+%{__mkdir_p} %{buildroot}{%{_sysconfdir}/{init.d,sysconfig},%{_datarootdir}/%{name}/lib,%{_sharedstatedir}/%{name},%{_localstatedir}/log/%{name}}
+%{__install} -m 0644 %{SOURCE0} %{buildroot}%{_datarootdir}/%{name}/lib
+%{__install} -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/sysconfig/%{name}
+%{__install} -m 0755 %{SOURCE2} %{buildroot}%{_sysconfdir}/init.d/%{name}
+touch %{buildroot}%{_localstatedir}/log/%{name}/run.log
+
+%pre
+/usr/sbin/groupadd -r gitbucket &> /dev/null || :
+/usr/sbin/useradd -g gitbucket -s /bin/false -r -c "GitBucket GitHub clone" -d %{_sharedstatedir}/%{name} gitbucket &> /dev/null || :
+
+%post
+/sbin/chkconfig --add gitbucket
+
+%preun
+if [ "$1" = 0 ]; then
+  /sbin/service gitbucket stop > /dev/null 2>&1
+  /sbin/chkconfig --del gitbucket
+fi
+exit 0
+
+%postun
+if [ "$1" -ge 1 ]; then
+  /sbin/service gitbucket restart > /dev/null 2>&1
+fi
+exit 0
+
+%clean
+[ "%{buildroot}" != / ] && %{__rm} -rf "%{buildroot}"
+
+
+%files
+%defattr(-,root,root,-)
+%{_datarootdir}/%{name}/lib/%{name}.war
+%config %{_sysconfdir}/init.d/%{name}
+%config(noreplace) %{_sysconfdir}/sysconfig/%{name}
+%attr(0755,gitbucket,gitbucket) %{_sharedstatedir}/%{name}
+%attr(0750,gitbucket,gitbucket) %{_localstatedir}/log/%{name}
