@@ -10,7 +10,7 @@ License:	Apache
 URL:		https://github.com/gitbucket/gitbucket
 Group:		System/Servers
 Source0:	https://github.com/gitbucket/gitbucket/releases/download/#RPM_VERSION#/gitbucket.war
-Source1:	https://github.com/gitbucket/gitbucket/raw/#RPM_VERSION#/contrib/gitbucket.conf
+Source1:	gitbucket.sysconfig
 Source2:	gitbucket.init
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 BuildArch:	noarch
