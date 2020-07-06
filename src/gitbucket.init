@@ -47,6 +47,7 @@ fi
 [ -f ${NAME}.conf ] && source ${NAME}.conf                # For all systems
 
 # Location of the log and PID file
+: ${GITBUCKET_LOG_DIR="/var/log/${NAME}"}
 : ${GITBUCKET_INIT_LOG_FILE:="$GITBUCKET_LOG_DIR/init.log"}
 : ${GITBUCKET_LOG_FILE:="$GITBUCKET_LOG_DIR/run.log"}
 : ${GITBUCKET_PID_DIR:="/var/run/${NAME}"}
@@ -58,8 +59,9 @@ fi
 : ${GITBUCKET_GROUP:="${NAME}"}
 : ${GITBUCKET_HOME:="/var/lib/${NAME}"}
 : ${GITBUCKET_WAR_FILE:="/usr/share/${NAME}/lib/${NAME}.war"}
+: ${GITBUCKET_JVM_OPTS:="-Dmail.smtp.starttls.enable=true"}
 : ${GITBUCKET_MAX_LOG:=5}                        # To rotate stdout/err log files
-: ${GITBUCKET_DELAY:=5}                            # To wait upon start/stop
+: ${GITBUCKET_DELAY:=5}                          # To wait upon start/stop
 
 # Some defaults
 RETVAL=0
@@ -106,7 +108,7 @@ function start()
     $SU ${GITBUCKET_USER} -c "touch '${GITBUCKET_PID_FILE}' 2> /dev/null && rm -f '${GITBUCKET_PID_FILE}'" \
     || { rm -rf "${GITBUCKET_PID_DIR}" && mkdir -p "${GITBUCKET_PID_DIR}" && chown ${GITBUCKET_USER}:${GITBUCKET_GROUP} "${GITBUCKET_PID_DIR}"; }
 
-    # Collection options to start the daemon
+    # Collection options to start the daemon and extra classpaths
     START_OPTS=
     if [ $GITBUCKET_PORT ]; then
         START_OPTS="${START_OPTS} --port=${GITBUCKET_PORT}"
@@ -117,10 +119,15 @@ function start()
     if [ $GITBUCKET_HOST ]; then
         START_OPTS="${START_OPTS} --host=${GITBUCKET_HOST}"
     fi
+    if [ $GITBUCKET_CLASSPATH ]; then
+        GITBUCKET_CLASSPATH="${GITBUCKET_WAR_FILE}:${GITBUCKET_CLASSPATH}"
+    else
+        GITBUCKET_CLASSPATH="${GITBUCKET_WAR_FILE}"
+    fi
 
     # Start the daemon using nohup and write pid
     GITBUCKET_HOME="${GITBUCKET_HOME}" $SU ${GITBUCKET_USER} -c "\
-nohup java -cp $GITBUCKET_WAR_FILE:$GITBUCKET_CP $GITBUCKET_JVM_OPTS JettyLauncher $START_OPTS >> $GITBUCKET_LOG_FILE 2>&1 & \
+nohup java -cp $GITBUCKET_CLASSPATH $GITBUCKET_JVM_OPTS JettyLauncher $START_OPTS >> $GITBUCKET_LOG_FILE 2>&1 & \
 sleep ${GITBUCKET_DELAY} && \
 echo \$! > ${GITBUCKET_PID_FILE}\
 "
@@ -170,8 +177,8 @@ function stop()
 
 function status()
 {
-	  # See LSB doc for exit codes
-	  # https://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+    # See LSB doc for exit codes
+    # https://refspecs.linuxbase.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
     PID=$(pidofproc -p "${GITBUCKET_PID_FILE}" "${NAME}")
     RETVAL="$?"
     if [ "$RETVAL" -eq "0" ]; then
@@ -211,7 +218,7 @@ case "$1" in
             stop
             start
         else
-        	  # If not running action should return 0 - see LSB doc
+            # If not running action should return 0 - see LSB doc
             RETVAL="0"
         fi
         ;;

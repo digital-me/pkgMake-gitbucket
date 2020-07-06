@@ -1,0 +1,25 @@
+# Bind host
+GITBUCKET_HOST=0.0.0.0
+
+# Other Java option
+GITBUCKET_JVM_OPTS=-Dmail.smtp.starttls.enable=true
+
+# Data directory, holds repositories
+GITBUCKET_HOME=/var/lib/gitbucket
+
+GITBUCKET_LOG_DIR=/var/log/gitbucket
+
+# Server port
+GITBUCKET_PORT=8080
+
+# URL prefix for the GitBucket page (http://<host>:<port>/<prefix>/)
+GITBUCKET_PREFIX=
+
+# Directory where GitBucket is installed
+# Configuration is stored here:
+GITBUCKET_DIR=/usr/share/gitbucket
+GITBUCKET_WAR_DIR=$GITBUCKET_DIR/lib
+
+# Path to the WAR file and extra classpath
+GITBUCKET_WAR_FILE=$GITBUCKET_WAR_DIR/gitbucket.war
+GITBUCKET_CLASSPATH=
